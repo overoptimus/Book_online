@@ -101,7 +101,7 @@
       and CustomerName = #{customername,jdbcType=VARCHAR}
   </select>
   <select id="selectBycustomerId" resultMap="BaseResultMap" parameterType="INTEGER">
-    select tb_customerinfo.CustomerName,tb_customer.CustomerAddr
+    select tb_customerinfo.Customertruename,tb_customerinfo.CustomerAddr
     from tb_customerinfo
     where tb_customerinfo.customerId = #{customerId}
   </select>

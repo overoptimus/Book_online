@@ -22,8 +22,8 @@ public class ShopBookController {
                               @RequestParam("bookIdList") String bookIdList,
                               @RequestParam("orderMount") Integer orderMount,
                               @RequestParam("totalPrice") Double totalPrice){
-        shopBookService.submitOrder(customerId, bookIdList, orderMount, totalPrice);
-        return null;
+        String soult = shopBookService.submitOrder(customerId, bookIdList, orderMount, totalPrice);
+        return soult;
     }
 
     @RequestMapping(value = "/shopcar")

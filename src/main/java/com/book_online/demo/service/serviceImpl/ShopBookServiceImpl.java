@@ -31,6 +31,10 @@ public class ShopBookServiceImpl implements ShopBookService {
     public String submitOrder(Integer customerId, String bookIdList, Integer orderMount, Double totalPrice) {
 
         String[] books = bookIdList.split(",");
+        for (int i = 0; i < books.length; i++){
+            System.out.println(books[i]);
+
+        }
         ShopBookKey shopBookKey = new ShopBookKey();
         CustomerInfo customerInfo =  customerInfoMapper.selectBycustomerId(customerId);
 
@@ -43,14 +47,18 @@ public class ShopBookServiceImpl implements ShopBookService {
         order.setOrderdate(date);
         order.setReceveraddr(customerInfo.getCustomeraddr());
         order.setRecevername(customerInfo.getCustomertruename());
+//        System.out.println("接收人名字：" + customerInfo.getCustomertruename());
         order.setOrdermount(orderMount);
         order.setTotalprice(totalPrice);
         orderMapper.insert(order);
         for (int i = 0; i<books.length;i++){
-            shopBookKey.setCustomerid(customerId);
-            shopBookKey.setBookid(Integer.getInteger(books[i]));
-            shopBookMapper.deleteByPrimaryKey(shopBookKey);
-
+                shopBookKey.setCustomerid(customerId);
+//                System.out.println("customerId  :" + customerId);
+                shopBookKey.setBookid(Integer.parseInt(books[i]));
+//                System.out.println("shopbookkey_bookid:" + shopBookKey.getBookid());
+//                System.out.println("shopbookkey_customerid:" + shopBookKey.getCustomerid());
+//                System.out.println(shopBookKey.getBookid() + "  " + shopBookKey.getCustomerid());
+                shopBookMapper.deleteByPrimaryKey(shopBookKey);
         }
         return "提交订单成功";
     }

@@ -132,86 +132,6 @@ $(function refresh() {
     // });
 
 
-    //=================================================商品数量==============================================
-    var $plus = $('.plus'),
-        $reduce = $('.reduce'),
-        $all_sum = $('.sum');
-    $plus.click(function () {
-        var $inputVal = $(this).prev('input'),
-            $count = parseInt($inputVal.val())+1,
-            $obj = $(this).parents('.amount_box').find('.reduce'),
-            $priceTotalObj = $(this).parents('.order_lists').find('.sum_price'),
-            $price = $(this).parents('.order_lists').find('.price').text(),  //单价
-            $priceTotal = ($count*parseFloat($price)).toFixed(2);
-        console.log("count:" + $count);
-        bookId = $(this).parents('.order_lists').find('.list_chk').find("input[type='checkbox']").val();
-        $inputVal.val($count);
-        $priceTotalObj.html($priceTotal);
-        if($inputVal.val()>1 && $obj.hasClass('reSty')){
-            $obj.removeClass('reSty');
-        }
-        totalMoney();
-        $.ajax({
-            url: "/shopcar/updateshopbookmount",
-            type: "GET",
-            data: {
-                ordermount: $count,
-                bookId: bookId,
-                customerId : customerId
-            },
-           success: function () {
-              console.log("更新数据库成功");
-           }
-
-        });
-    });
-
-    $reduce.click(function () {
-        var $inputVal = $(this).next('input'),
-            $count = parseInt($inputVal.val())-1,
-            $priceTotalObj = $(this).parents('.order_lists').find('.sum_price'),
-            $price = $(this).parents('.order_lists').find('.price').text(),  //单价
-            $priceTotal = ($count*parseFloat($price)).toFixed(2);
-        console.log("count:" + $count);
-        bookId = $(this).parents('.order_lists').find('.list_chk').find("input[type='checkbox']").val();
-
-        if($inputVal.val()>1){
-            $inputVal.val($count);
-            $priceTotalObj.html($priceTotal);
-        }
-        if($inputVal.val()==1 && !$(this).hasClass('reSty')){
-            $(this).addClass('reSty');
-        }
-        totalMoney();
-        $.ajax({
-            url: "/shopcar/updateshopbookmount",
-            type: "GET",
-            data: {
-                ordermount: $count,
-                customerId: customerId,
-                bookId: bookId
-            },
-            success: function () {
-              console.log("更新数据库成功");
-            }
-        });
-    });
-
-    $all_sum.keyup(function () {
-        var $count = 0,
-            $priceTotalObj = $(this).parents('.order_lists').find('.sum_price'),
-            $price = $(this).parents('.order_lists').find('.price').text(),  //单价
-            $priceTotal = 0;
-        if($(this).val()==''){
-            $(this).val('1');
-        }
-        $(this).val($(this).val().replace(/\D|^0/g,''));
-        $count = $(this).val();
-        $priceTotal = $count*parseInt($price.substring(1));
-        $(this).attr('value',$count);
-        $priceTotalObj.html($priceTotal);
-        totalMoney();
-    })
 
     //======================================移除商品========================================
 
@@ -293,7 +213,7 @@ $(function refresh() {
         console.log(total_money,total_count);
 
         if(total_money!=0 && total_count!=0){
-            console.log("执行加class名字的方法前");
+            // console.log("执行加class名字的方法前");
             if(!calBtn.hasClass('btn_sty')){
                 calBtn.addClass('btn_sty');
             }
@@ -305,37 +225,40 @@ $(function refresh() {
         refresh();
     }
 
-    //结算按钮还未实现
-    // $(".btn_sty").click(function () {
-    //     var bookIdList = "";
-    //     var orderMount = 0;
-    //     var totalPrice = 0;
-    //     $cartBox_allCheckbox.each(function () {
-    //         if($(this).is(":checked")){
-    //             bookIdList += $(this).parents('.order_lists').find('.list_chk').find("input[type='checkbox']").val() + ",";
-    //             console.log(bookIdList);
-    //             orderMount += $(this).parents('.order_lists').find('.list_amount').find("input [type='text']").val();
-    //             console.log(orderMount);
-    //         }
-    //         totalPrice = $(".total_text").val().substr(1);
-    //     });
-    //     $.ajax(
-    //         {
-    //             url: "/shopcar/submitorder",
-    //             type: "GET",
-    //             data: {
-    //                 customerId: customerId,
-    //                 bookIdList: bookIdList,
-    //                 orderMount: orderMount,
-    //                 totalPrice: totalPrice
-    //             },
-    //             success: function () {
-    //                 console.log("成功提交订单");
-    //             }
-    //         }
-    //     );
-    // });
-    
+    // 结算按钮还未实现
+    $(".btn_sty").click(function () {
+        var bookIdList = "";
+        var orderMount = 0;
+        var totalPrice = 0;
+        $cartBox_allCheckbox.each(function () {
+            if($(this).is(":checked")){
+                bookIdList += $(this).parents('.order_lists').find('.list_chk').find("input[type='checkbox']").val() + ",";
+                console.log("bookList=" + bookIdList);
+            }
+            orderMount = $(".piece_num").text();
+            console.log("orderMount=" + orderMount);
+
+            totalPrice = $(".total_text").text().substr(1);
+
+            console.log("totalPrice=" + totalPrice);
+        });
+        $.ajax(
+            {
+                url: "/shopcar/submitorder",
+                type: "GET",
+                data: {
+                    customerId: customerId,
+                    bookIdList: bookIdList,
+                    orderMount: orderMount,
+                    totalPrice: totalPrice
+                },
+                success: function () {
+                    console.log("成功提交订单");
+                }
+            }
+        );
+    });
+
     function showShopCar(pageNum, userId){
         $(".cartBox").empty();
         $("#cartPage_num").empty();
@@ -404,7 +327,7 @@ $(function refresh() {
 
     $("#showAllbooks").click(function () {
         showShopCar(1, customerId);
-        totalMoney();
+        // totalMoney();
     });
 
     //和孙琦连接之后取消注释，获取他传递的userId
@@ -412,3 +335,39 @@ $(function refresh() {
 
 
 });
+
+
+//=================================================商品数量==============================================
+var $plus = $('.plus'),
+    $reduce = $('.reduce'),
+    $all_sum = $('.sum');
+$plus.click(function () {
+    var $inputVal = $(this).prev('input'),
+        $count = parseInt($inputVal.val())+1,
+        $obj = $(this).parents('.amount_box').find('.reduce'),
+        $priceTotalObj = $(this).parents('.order_lists').find('.sum_price'),
+        $price = $(this).parents('.order_lists').find('.price').text(),  //单价
+        $priceTotal = ($count*parseFloat($price)).toFixed(2);
+    console.log("count:" + $count);
+    bookId = $(this).parents('.order_lists').find('.list_chk').find("input[type='checkbox']").val();
+    $inputVal.val($count);
+    $priceTotalObj.html($priceTotal);
+    if($inputVal.val()>1 && $obj.hasClass('reSty')){
+        $obj.removeClass('reSty');
+    }
+    totalMoney();
+    $.ajax({
+        url: "/shopcar/updateshopbookmount",
+        type: "GET",
+        data: {
+            ordermount: $count,
+            bookId: bookId,
+            customerId : customerId
+        },
+        success: function () {
+            console.log("更新数据库成功");
+        }
+
+    });
+});
+
