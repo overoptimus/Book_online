@@ -1,7 +1,11 @@
 /**
  * Created by Administrator on 2017/5/24.
  */
+
+
 var customerId,bookId;
+
+
 $(function refresh() {
 
     //全局的checkbox选中和未选中的样式
@@ -33,6 +37,7 @@ $(function refresh() {
         }
         totalMoney();
     });
+
 
 
     // $sonCheckBox.each(function () {
@@ -138,6 +143,7 @@ $(function refresh() {
             $priceTotalObj = $(this).parents('.order_lists').find('.sum_price'),
             $price = $(this).parents('.order_lists').find('.price').text(),  //单价
             $priceTotal = ($count*parseFloat($price)).toFixed(2);
+        console.log("count:" + $count);
         bookId = $(this).parents('.order_lists').find('.list_chk').find("input[type='checkbox']").val();
         $inputVal.val($count);
         $priceTotalObj.html($priceTotal);
@@ -166,6 +172,7 @@ $(function refresh() {
             $priceTotalObj = $(this).parents('.order_lists').find('.sum_price'),
             $price = $(this).parents('.order_lists').find('.price').text(),  //单价
             $priceTotal = ($count*parseFloat($price)).toFixed(2);
+        console.log("count:" + $count);
         bookId = $(this).parents('.order_lists').find('.list_chk').find("input[type='checkbox']").val();
 
         if($inputVal.val()>1){
@@ -226,8 +233,7 @@ $(function refresh() {
 
                     } ,
                 success: function () {
-                    $(".cartBox").html("");
-                    showShopCar();
+                    showShopCar(1, customerId);
                 }
             });
         }
@@ -284,9 +290,10 @@ $(function refresh() {
         $('.total_text').html('￥' + total_money.toFixed(2));
         $('.piece_num').html(total_count);
 
-        // console.log(total_money,total_count);
+        console.log(total_money,total_count);
 
         if(total_money!=0 && total_count!=0){
+            console.log("执行加class名字的方法前");
             if(!calBtn.hasClass('btn_sty')){
                 calBtn.addClass('btn_sty');
             }
@@ -295,22 +302,55 @@ $(function refresh() {
                 calBtn.removeClass('btn_sty');
             }
         }
+        refresh();
     }
 
-
-    function showShopCar(){
+    //结算按钮还未实现
+    // $(".btn_sty").click(function () {
+    //     var bookIdList = "";
+    //     var orderMount = 0;
+    //     var totalPrice = 0;
+    //     $cartBox_allCheckbox.each(function () {
+    //         if($(this).is(":checked")){
+    //             bookIdList += $(this).parents('.order_lists').find('.list_chk').find("input[type='checkbox']").val() + ",";
+    //             console.log(bookIdList);
+    //             orderMount += $(this).parents('.order_lists').find('.list_amount').find("input [type='text']").val();
+    //             console.log(orderMount);
+    //         }
+    //         totalPrice = $(".total_text").val().substr(1);
+    //     });
+    //     $.ajax(
+    //         {
+    //             url: "/shopcar/submitorder",
+    //             type: "GET",
+    //             data: {
+    //                 customerId: customerId,
+    //                 bookIdList: bookIdList,
+    //                 orderMount: orderMount,
+    //                 totalPrice: totalPrice
+    //             },
+    //             success: function () {
+    //                 console.log("成功提交订单");
+    //             }
+    //         }
+    //     );
+    // });
+    
+    function showShopCar(pageNum, userId){
         $(".cartBox").empty();
+        $("#cartPage_num").empty();
         $.ajax({
             url: "/shopcar",
             type: "GET",
             data: {
-                id: $("#customerId").text()  //获取当前登陆的用户的id值
+                id: $("#customerId").text(),  //获取当前登陆的用户的id值
+                pageNum : pageNum
             },
             dataType: "json",
             success: function (allBook) {
                 //在其中对获取的的书进行便利写成html语言
-                customerId = allBook[0].customerid;
-                $.each(allBook,function (index, value) {
+                customerId = allBook.list[0].customerid;
+                $.each(allBook.list,function (index, value) {
                     var $div = $(".cartBox");
                     var $ul = $("<ul class = 'order_lists'></ul>");
                     var $li_chk = $("<li class = 'list_chk'></li>");
@@ -333,7 +373,7 @@ $(function refresh() {
                     $li_amount.append("<div class='amount_box'><a href='javascript:;' class='reduce reSty'>-</a>"
                         + "<input type='text' readonly='readonly' value='"+ value.ordermount +"' class='sum'/>"
                         + "<a href='javascript:;' class='plus'>+</a></div>");
-                    $li_sum.append("<p class='sum_price'>" + value.ordermount*value.book.bookprice + "</p>");
+                    $li_sum.append("<p class='sum_price'>" + (value.ordermount*value.book.bookprice).toFixed(2) + "</p>");
                     $li_op.append("<p class='del'><a href='javascript:;' class='delBtn'>移除书籍</a></p>");
                     $ul.append($li_chk);
                     $ul.append($li_con);
@@ -344,20 +384,31 @@ $(function refresh() {
                     $ul.append($li_op);
                     $div.append($ul);
                 });
-                if(allBook.length != null){
-                    allBook.cleanData();
-                }
+                $cartPage_num = $("#cartPage_num");
+                $.each(allBook.navigatepageNums,function (index, pageNum) {
+                    console.log($cartPage_num);
+                    $("#cartPage_num").append("<a class='page_num' href='javascript:;'>" + pageNum + "</a>");
+                });
                 refresh();
 
             }
         });
     }
 
+    //页码点击事件
+    $(".page_num").click(function () {
+        console.log("页码" + this.innerText);
+        showShopCar(this.innerText, customerId);
+    });
+
 
     $("#showAllbooks").click(function () {
-        $(".cartBox").html("");
-        showShopCar();
+        showShopCar(1, customerId);
         totalMoney();
     });
+
+    //和孙琦连接之后取消注释，获取他传递的userId
+    // showShopCar(1,userId);
+
 
 });

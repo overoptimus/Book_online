@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:mysql://catheart.net:3306/CAT
+    username: cat
+    password: cat
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+
+
+mybatis:
+  mapper-locations: classpath:mapping/*.xml
+  type-aliases-package: com.book_online.demo.model
+
+
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+mapper:
+  mappers:
+  - com.book_online.demo.mapper
+  not-empty: false
+  identity: MYSQL
