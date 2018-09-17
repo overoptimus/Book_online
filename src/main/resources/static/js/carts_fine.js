@@ -346,11 +346,13 @@ $(function () {
     $(".cartBox").on("click","img",function () {
         bookId = $(this).parents('.order_lists').find('.list_chk').find("input[type='checkbox']").val();
         //通过bookId跳转到书籍详情页
+        window.open("http://catheart.net:8080/cat/BookDetail.jsp?BookId=" + bookId + "&CustomerId=1","_self");
     });
 
     $(".cartBox").on("click",".list_text",function () {
         bookId = $(this).parents('.order_lists').find('.list_chk').find("input[type='checkbox']").val();
         //通过bookId跳转到详情页
+        window.open("http://catheart.net:8080/cat/BookDetail.jsp?BookId=" + bookId + "&CustomerId=1","_self");
     })
 
     //和孙琦连接之后取消注释，获取他传递的userId
